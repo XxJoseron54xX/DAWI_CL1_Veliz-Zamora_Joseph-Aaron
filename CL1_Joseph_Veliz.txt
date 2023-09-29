@@ -1,0 +1,154 @@
+org.cibertec.edu.pe.entity 
+
+package org.cibertec.edu.pe.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "producto")
+public class Producto {
+	@Id
+	@Column(name="idProducto", length = 6, nullable = false)
+	private String idProducto;
+	@Column(name="Descripcion", length = 50, nullable = false)
+	private String Descripcion;
+	@Column(name="PrecioUnidad", columnDefinition = "DECIMAL(50,500)")
+	private double PrecioUnidad;
+	@Column(name="Stock", nullable = false)
+	private int Stock;
+	@Column(name = "Estado", nullable = false)
+	private char Estado;
+	// Creamos los constructores
+	
+	public Producto() {
+	}
+	public Producto(String idProducto, String descripcion, int precioUnidad, int stock, char estado) {
+		idProducto = idProducto;
+		Descripcion = descripcion;
+		PrecioUnidad = precioUnidad;
+		Stock = stock;
+		Estado = estado;
+	}
+	
+	//get - set
+
+	public String getIdProducto() {
+		return idProducto;
+	}
+	public void setIdProducto(String idProducto) {
+		this.idProducto = idProducto;
+	}
+	public String getDescripcion() {
+		return Descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		Descripcion = descripcion;
+	}
+	public double getPrecioUnidad() {
+		return PrecioUnidad;
+	}
+	public void setPrecioUnidad(int precioUnidad) {
+		PrecioUnidad = precioUnidad;
+	}
+	public int getStock() {
+		return Stock;
+	}
+	public void setStock(int stock) {
+		Stock = stock;
+	}
+	public char getEstado() {
+		return Estado;
+	}
+	public void setEstado(char estado) {
+		Estado = estado;
+	}
+}
+
+org.cibertec.edu.pe.controller
+
+package org.cibertec.edu.pe.controller;
+
+import java.util.List;
+
+import org.cibertec.edu.pe.interfacesService.IProductoService;
+import org.cibertec.edu.pe.entity.Producto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping
+public class ProductoController {
+	
+	@Autowired
+	private IProductoService prod;
+	
+	// Método para Listado
+	@GetMapping("/listar")
+	public String Listar(Model vz) {
+		List<Producto> lista = prod.Listado();
+		vz.addAttribute("productos", lista);
+		return "listar";
+	}
+	
+	// Método para agregar(nuevo)
+		@GetMapping("/nuevo")
+		public String Nuevo(Model vz) {
+			vz.addAttribute("productos", new Producto());
+			return "formulario";			// form.html
+		}
+}
+
+org.cibertec.edu.pe.Interfaces
+
+package org.cibertec.edu.pe.interfaces;
+
+import org.cibertec.edu.pe.entity.Producto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface IProducto extends JpaRepository<Producto, Integer> {
+
+}
+
+org.cibertec.edu.pe.interfacesServices
+
+package org.cibertec.edu.pe.interfacesService;
+import java.util.List;
+import org.cibertec.edu.pe.entity.Producto;
+
+public interface IProductoService {
+	public List<Producto> Listado();
+}
+
+
+org.cibertec.edu.pe.services
+
+
+package org.cibertec.edu.pe.services;
+
+import java.util.List;
+
+import org.cibertec.edu.pe.interfacesService.IProductoService;
+import org.cibertec.edu.pe.interfaces.IProducto;
+import org.cibertec.edu.pe.entity.Producto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ProductoService implements IProductoService{
+
+	@Autowired
+	private IProducto vzP;
+	
+	@Override
+	public List<Producto> Listado(){
+		return (List<Producto>)vzP.findAll();
+	}
+}
